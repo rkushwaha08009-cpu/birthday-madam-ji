@@ -1,0 +1,331 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Birthday Website Control Center</title>  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />  
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=400;600&family=Sriracha&display=swap" rel="stylesheet">  
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>  
+    <style>  
+        :root {  
+            --primary: #FF7882;  
+            --dark: #333333;  
+            --bg-light: #fff8e4;  
+            --soft-pink: #feecea;  
+        }  
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }  
+        body { background: var(--soft-pink); color: var(--dark); padding: 20px; }  
+        .admin-container { max-width: 700px; margin: 0 auto; background: white; border: 4px solid var(--dark); border-radius: 24px; padding: 30px; box-shadow: 0 10px 0 var(--dark); }  
+        h1 { font-family: 'Sriracha', cursive; color: var(--primary); text-align: center; margin-bottom: 25px; font-size: 2.2rem; text-shadow: 2px 2px 0px var(--dark); -webkit-text-stroke: 1px var(--dark); }  
+        .section-card { background: var(--bg-light); border: 3px solid var(--dark); border-radius: 16px; padding: 20px; margin-bottom: 25px; box-shadow: 4px 4px 0 var(--dark); }  
+        .section-card h3 { color: var(--primary); font-family: 'Sriracha', cursive; font-size: 1.3rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }  
+        .form-group { margin-bottom: 15px; }  
+        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; }  
+        input[type="text"], input[type="datetime-local"], textarea { width: 100%; padding: 12px; border: 3px solid var(--dark); border-radius: 10px; font-size: 1rem; outline: none; background: white; }  
+        input:focus, textarea:focus { border-color: var(--primary); }  
+        .file-upload-box { border: 2px dashed var(--primary); padding: 15px; border-radius: 10px; background: white; text-align: center; cursor: pointer; position: relative; }  
+        .file-upload-box input[type="file"] { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor: pointer; }  
+        .status-msg { font-size: 0.85rem; color: #666; margin-top: 5px; font-style: italic; }  
+        .db-status { font-weight: bold; color: #2ed573 !important; }  
+          
+        .wishes-manage-list { margin-top: 15px; max-height: 180px; overflow-y: auto; background: white; border: 2px solid var(--dark); border-radius: 10px; padding: 10px; }  
+        .wish-item-node { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px dashed #ccc; }  
+        .wish-item-node:last-child { border: none; }  
+        .delete-wish-btn { background: #ff4757; color: white; border: 2px solid var(--dark); padding: 2px 8px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }  
+          
+        .btn-primary { width: 100%; background: var(--primary); color: white; border: 3px solid var(--dark); border-radius: 50px; padding: 15px; font-size: 1.2rem; font-family: 'Sriracha', cursive; cursor: pointer; box-shadow: 0 6px 0 var(--dark); transition: 0.2s; font-weight: bold; }  
+        .btn-primary:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--dark); }  
+        .btn-secondary { width: 100%; background: #747d8c; color: white; border: 3px solid var(--dark); border-radius: 50px; padding: 10px; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 0 var(--dark); margin-top: 15px; transition: 0.2s; }  
+        .btn-secondary:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--dark); }  
+        .btn-add-wish { background: #2ed573; border: 2px solid var(--dark); border-radius: 8px; padding: 6px 15px; font-weight: bold; color: white; cursor: pointer; margin-top: 5px; display: inline-block; }  
+    </style>  
+</head>  
+<body>  
+  
+    <div class="admin-container">  
+        <h1>⚙️ Birthday Website Control Panel</h1>  
+  
+        <div class="section-card">  
+            <h3><i class="fa-solid fa-pen-fancy"></i> Basic Information Setup</h3>  
+            <div class="form-group">  
+                <label>Celebrant Name (e.g., Dear Mehwish)</label>  
+                <input type="text" id="cfgName" placeholder="Dear Mehwish">  
+            </div>  
+            <div class="form-group">  
+                <label>Date of Birth Text Label (e.g., 27 May)</label>  
+                <input type="text" id="cfgDOB" placeholder="27 May">  
+            </div>  
+            <div class="form-group">  
+                <label>Countdown Unlock Time (Optional)</label>  
+                <input type="datetime-local" id="cfgTargetTime">  
+                <p class="status-msg">Kuch na daalne par countdown block automatic bypass ho jayega.</p>  
+            </div>  
+        </div>  
+  
+        <div class="section-card">  
+            <h3><i class="fa-solid fa-envelope-open-text"></i> Personal Letter Content</h3>  
+            <div class="form-group">  
+                <label>Letter Envelope Typing Title</label>  
+                <input type="text" id="cfgLetterTitle" placeholder="To you">  
+            </div>  
+            <div class="form-group">  
+                <label>Autotyping Body Text Content</label>  
+                <textarea id="cfgLetterBody" rows="4" placeholder="Type intro content here..."></textarea>  
+            </div>  
+            <div class="form-group">  
+                <label>Static Bottom Wishes Paragraph</label>  
+                <textarea id="cfgLetterStatic" rows="4" placeholder="Type core detailed paragraphs wishes here..."></textarea>  
+            </div>  
+        </div>  
+  
+        <div class="section-card">  
+            <h3><i class="fa-solid fa-images"></i> Interactive Media Config (IndexedDB Engine Active)</h3>  
+              
+            <div class="form-group">  
+                <label>Main Profile Avatar Graphic File:</label>  
+                <div class="file-upload-box">  
+                    <span id="lblAvatar">Click or Drop Profile Picture Here 🖼️</span>  
+                    <input type="file" id="fileAvatar" accept="image/*">  
+                </div>  
+                <p class="status-msg" id="dbStatusAvatar"></p>  
+            </div>  
+  
+            <div class="form-group">  
+                <label>Special Birthday Video File OR Local Path:</label>  
+                <input type="text" id="txtVideoPath" placeholder="E.g., ./images/1000055273.mp4" style="margin-bottom: 10px;">  
+                <div class="file-upload-box">  
+                    <span id="lblVideo">OR Choose/Upload Video File</span>  
+                    <input type="file" id="fileVideo" accept="video/mp4">  
+                </div>  
+                <p class="status-msg" id="dbStatusVideo"></p>  
+            </div>  
+  
+            <div class="form-group">  
+                <label>Background Aesthetic Music File OR Local Path:</label>  
+                <input type="text" id="txtMusicPath" placeholder="E.g., ./images/audio.mp3" style="margin-bottom: 10px;">  
+                <div class="file-upload-box">  
+                    <span id="lblMusic">OR Choose/Upload Background MP3 File</span>  
+                    <input type="file" id="fileMusic" accept="audio/mp3">  
+                </div>  
+                <p class="status-msg" id="dbStatusMusic"></p>  
+            </div>  
+  
+            <div class="form-group">  
+                <label>Memories Stack Snapshots (Select Multiple Images):</label>  
+                <div class="file-upload-box" style="border-style: solid;">  
+                    <span id="lblGallery">Upload Grid Memories 📸</span>  
+                    <input type="file" id="fileGallery" accept="image/*" multiple>  
+                </div>  
+                <p class="status-msg" id="compressorStatus">No changes captured yet.</p>  
+            </div>  
+        </div>  
+  
+        <div class="section-card">  
+            <h3><i class="fa-solid fa-comments"></i> Friends Wish Box (Comment Wall)</h3>  
+            <div class="form-group">  
+                <input type="text" id="addFriendName" placeholder="Friend Name" style="margin-bottom: 8px;">  
+                <textarea id="addFriendMessage" rows="2" placeholder="Birthday Message Text..."></textarea>  
+                <button type="button" class="btn-add-wish" id="pushWishButton">+ Add Friend's Message</button>  
+            </div>  
+            <div class="wishes-manage-list" id="wishesUIRenderer"></div>  
+        </div>  
+  
+        <button type="button" class="btn-primary" id="saveGlobalConfigBtn">🚀 Save All Modifications & Deploy Live</button>  
+        <button type="button" class="btn-secondary" id="wipeGlobalStorageBtn">⚠️ Wipe Out Settings Database</button>  
+  
+    </div>  
+  
+    <script>  
+        const dbName = "BirthdayMediaExtendedDB";  
+        let db = null;  
+
+        const dbRequest = indexedDB.open(dbName, 1);  
+        dbRequest.onupgradeneeded = function(e) {  
+            let database = e.target.result;  
+            if (!database.objectStoreNames.contains("heavyMedia")) {  
+                database.createObjectStore("heavyMedia");  
+            }  
+        };  
+        dbRequest.onsuccess = function(e) {  
+            db = e.target.result;  
+            syncIndexedDBStatus();  
+        };  
+  
+        let loadedAvatarData = "";  
+        let loadedVideoData = "";  
+        let loadedMusicData = "";  
+        let globalGalleryArray = [];  
+        let globalWishesArray = [];  
+  
+        $(document).ready(function() {  
+            $('#cfgName').val(localStorage.getItem('cfgName') || "Dear Mehwish");  
+            $('#cfgDOB').val(localStorage.getItem('cfgDOB') || "27 May");  
+            $('#cfgTargetTime').val(localStorage.getItem('cfgTargetTime') || "");  
+            $('#cfgLetterTitle').val(localStorage.getItem('cfgLetterTitle') || "To you");  
+            $('#cfgLetterBody').val(localStorage.getItem('cfgLetterBody') || "My love. You are a very special girl...");  
+            $('#cfgLetterStatic').val(localStorage.getItem('cfgLetterStatic') || "Happy birthday 🥳🎂🥳 chanda...");  
+              
+            let pathVid = localStorage.getItem('cfgVideoPath') || "";  
+            let pathMus = localStorage.getItem('cfgMusicPath') || "";  
+            if(pathVid) $('#txtVideoPath').val(pathVid);  
+            if(pathMus) $('#txtMusicPath').val(pathMus);  
+              
+            try { globalWishesArray = JSON.parse(localStorage.getItem('cfgFriendsWishes')) || []; } catch(e) { globalWishesArray = []; }  
+            renderWishesUI();  
+  
+            $('#fileAvatar').change(function(e) {  
+                let file = e.target.files[0];  
+                if(file) {  
+                    let reader = new FileReader();  
+                    reader.onload = function(evt) {  
+                        loadedAvatarData = evt.target.result;  
+                        $('#lblAvatar').text(`Selected: ${file.name} ✅`);  
+                    };  
+                    reader.readAsDataURL(file);  
+                }  
+            });  
+  
+            $('#fileVideo').change(function(e) {  
+                let file = e.target.files[0];  
+                if(file) {  
+                    $('#lblVideo').text(`Processing heavy video data... ⏳`);  
+                    let reader = new FileReader();  
+                    reader.onload = function(evt) {  
+                        loadedVideoData = evt.target.result;  
+                        $('#txtVideoPath').val('');  
+                        $('#lblVideo').text(`Video Ready: ${file.name} ✅`);  
+                    };  
+                    reader.readAsDataURL(file);  
+                }  
+            });  
+  
+            $('#fileMusic').change(function(e) {  
+                let file = e.target.files[0];  
+                if(file) {  
+                    let reader = new FileReader();  
+                    reader.onload = function(evt) {  
+                        loadedMusicData = evt.target.result;  
+                        $('#txtMusicPath').val('');  
+                        $('#lblMusic').text(`Song Ready: ${file.name} ✅`);  
+                    };  
+                    reader.readAsDataURL(file);  
+                }  
+            });  
+  
+            $('#fileGallery').change(function(e) {  
+                let files = Array.from(e.target.files);  
+                if(files.length === 0) return;  
+                  
+                globalGalleryArray = [];  
+                $('#compressorStatus').text(`Processing ${files.length} snapshots... ⏳`);  
+                let processed = 0;  
+  
+                files.forEach(file => {  
+                    let reader = new FileReader();  
+                    reader.onload = function(evt) {  
+                        globalGalleryArray.push(evt.target.result);  
+                        processed++;  
+                        if(processed === files.length) {  
+                            $('#compressorStatus').text(`Successfully linked ${processed} images. ✅`);  
+                        }  
+                    };  
+                    reader.readAsDataURL(file);  
+                });  
+            });  
+  
+            $('#pushWishButton').click(function() {  
+                let name = $('#addFriendName').val().trim();  
+                let msg = $('#addFriendMessage').val().trim();  
+                if(!name || !msg) { alert("Fields entry incomplete!"); return; }  
+                  
+                globalWishesArray.push({ name: name, text: msg });  
+                $('#addFriendName').val('');  
+                $('#addFriendMessage').val('');  
+                renderWishesUI();  
+            });  
+  
+            $('#saveGlobalConfigBtn').click(function() {  
+                localStorage.setItem('cfgName', $('#cfgName').val());  
+                localStorage.setItem('cfgDOB', $('#cfgDOB').val());  
+                localStorage.setItem('cfgTargetTime', $('#cfgTargetTime').val());  
+                localStorage.setItem('cfgLetterTitle', $('#cfgLetterTitle').val());  
+                localStorage.setItem('cfgLetterBody', $('#cfgLetterBody').val());  
+                localStorage.setItem('cfgLetterStatic', $('#cfgLetterStatic').val());  
+                localStorage.setItem('cfgFriendsWishes', JSON.stringify(globalWishesArray));  
+  
+                localStorage.setItem('cfgVideoPath', $('#txtVideoPath').val().trim());  
+                localStorage.setItem('cfgMusicPath', $('#txtMusicPath').val().trim());  
+  
+                if(!db) { alert("IndexedDB Engine dynamic load crash!"); return; }  
+                let tx = db.transaction("heavyMedia", "readwrite");  
+                let store = tx.objectStore("heavyMedia");  
+  
+                if(loadedAvatarData) store.put(loadedAvatarData, "avatarPhoto");  
+                if(loadedVideoData) store.put(loadedVideoData, "birthdayVideo");  
+                if(loadedMusicData) store.put(loadedMusicData, "bgMusicFile");  
+                if(globalGalleryArray.length > 0) store.put(JSON.stringify(globalGalleryArray), "galleryPhotos");  
+  
+                tx.oncomplete = function() {  
+                    alert("🎉 All configurations saved inside Extended Database successfully!");  
+                    window.location.reload();  
+                };  
+            });  
+  
+            $('#wipeGlobalStorageBtn').click(function() {  
+                if(confirm("Are you sure you want to completely format database?")) {  
+                    localStorage.clear();  
+                    if(db) {  
+                        let tx = db.transaction("heavyMedia", "readwrite");  
+                        tx.objectStore("heavyMedia").clear();  
+                        tx.oncomplete = function() { window.location.reload(); };  
+                    } else {  
+                        window.location.reload();  
+                    }  
+                }  
+            });  
+        });  
+  
+        function renderWishesUI() {  
+            let container = $('#wishesUIRenderer').empty();  
+            if(globalWishesArray.length === 0) {  
+                container.html(`<p style="color:#888; font-size:0.9rem; text-align:center;">No wishes added yet.</p>`);  
+                return;  
+            }  
+            globalWishesArray.forEach((item, index) => {  
+                let row = $(`  
+                    <div class="wish-item-node">  
+                        <span><strong>${item.name}:</strong> ${item.text.substring(0,35)}...</span>  
+                        <button class="delete-wish-btn" data-id="${index}">X</button>  
+                    </div>  
+                `);  
+                container.append(row);  
+            });  
+        }  
+  
+        $(document).on('click', '.delete-wish-btn', function() {  
+            let idx = $(this).data('id');  
+            globalWishesArray.splice(idx, 1);  
+            renderWishesUI();  
+        });  
+  
+        function syncIndexedDBStatus() {  
+            if(!db) return;  
+            let tx = db.transaction("heavyMedia", "readonly");  
+            let store = tx.objectStore("heavyMedia");  
+  
+            store.get("avatarPhoto").onsuccess = e => { if(e.target.result) $('#dbStatusAvatar').html("Status: <span class='db-status'>Saved in Database ✅</span>"); };  
+            store.get("birthdayVideo").onsuccess = e => { if(e.target.result) $('#dbStatusVideo').html("Status: <span class='db-status'>Video Loaded in Database ✅</span>"); };  
+            store.get("bgMusicFile").onsuccess = e => { if(e.target.result) $('#dbStatusMusic').html("Status: <span class='db-status'>Audio Loaded in Database ✅</span>"); };  
+            store.get("galleryPhotos").onsuccess = e => {   
+                if(e.target.result) {  
+                    let arr = JSON.parse(e.target.result);  
+                    $('#compressorStatus').html(`Status: <span class='db-status'>${arr.length} Photos Active ✅</span>`);  
+                    globalGalleryArray = arr;  
+                }  
+            };  
+        }  
+    </script>  
+</body>  
+  </html>
+  
