@@ -252,7 +252,6 @@ body {
 }  
 
 /* ⚡ FIXED: DATE LABELS TEXT JITTER BUG AND ANIMATION REALIGNMENT */
-.date__of__birth {  
 .date__of__birth, .name{  
     display: flex;  
     justify-content: space-around;  
